@@ -29,3 +29,4 @@ RUN chown -R www-data:www-data /var/www/html/bootstrap/cache \
 RUN composer install
 
 EXPOSE 8000
+

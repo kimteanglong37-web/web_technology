@@ -4,7 +4,6 @@ namespace App\Http\Requests\User;
 
 use Illuminate\Contracts\Validation\ValidationRule;
 use Illuminate\Foundation\Http\FormRequest;
-use SebastianBergmann\Type\TrueType;
 
 class SignupRequest extends FormRequest
 {
@@ -26,8 +25,8 @@ class SignupRequest extends FormRequest
         return [
             'name' => 'required|string|max:100',
             'email' => 'required|email|unique:users,email',
-            'password' => 'required|string|min:6|max:10|confirmed',
-            'callback_url' => 'required|url'
+            'password' => 'required|string|min:6|max:20|confirmed',
+            'callback_url' => 'required|url',
         ];
     }
 }

@@ -9,7 +9,7 @@ use Illuminate\Notifications\Messages\MailMessage;
 use Illuminate\Notifications\Notification;
 use URL;
 
-class EmailVerificationNotification extends Notification
+class EmailVerificationNotification extends Notification implements ShouldQueue
 {
     use Queueable;
 
@@ -46,6 +46,7 @@ class EmailVerificationNotification extends Notification
             ->action('Verify Email', $this->callback_url . '?forwarded-url=' . urlencode($verificationURL))
             ->line('If you did not create an account, no further action is required.')
             ->line('This verification link will expire in 5 minutes.');
+
     }
 
     protected function verificationURL($notifiable)

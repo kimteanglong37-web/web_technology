@@ -9,20 +9,25 @@ use Illuminate\Http\Request;
 use Laravel\Socialite\Socialite;
 
 
+  
+
 class GoogleOAuthController extends Controller
 {
-    function googleOAuthRedirect(Request $request)
-    {
-        $callback_url = $request->query('callback_url', '');
+function googleOAuthRedirect(Request $request)
+{
+    $callback_url = $request->query('callback_url', '');
 
-        $redirectUrl = Socialite::driver('google')
-            ->stateless()
-            ->with(['state' => base64_encode($callback_url)])
-            ->redirect()
-            ->getTargetUrl();
+    $redirectUrl = Socialite::driver('google')
+        ->stateless()
+        ->with([
+            'state' => base64_encode($callback_url),
+            'prompt' => 'select_account',
+        ])
+        ->redirect()
+        ->getTargetUrl();
 
-        return response(['redirect_url' => $redirectUrl], 200);
-    }
+    return response(['redirect_url' => $redirectUrl], 200);
+}
 
     function googleOAuthCallback(Request $request)
     {
@@ -45,7 +50,7 @@ class GoogleOAuthController extends Controller
         if (!$user->hasVerifiedEmail()) {
             $user->markEmailAsVerified();
         }
-
+       
         $token = $user->createToken('auth_token', ['exchange-new-token'], now()->addMinute())->plainTextToken;
 
         return redirect($callback_url . '?token=' . urlencode($token));

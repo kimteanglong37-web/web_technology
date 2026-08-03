@@ -9,13 +9,8 @@
           <p class="login-box-msg">Sign up for a new membership</p>
           <form @submit.prevent="signUp">
             <div class="input-group mb-3">
-              <input
-                type="text"
-                v-model="user.name"
-                class="form-control"
-                placeholder="Name"
-                :class="{ 'is-invalid': !!userError.name }"
-              />
+              <input type="text" v-model="user.name" class="form-control" placeholder="Name"
+                :class="{ 'is-invalid': !!userError.name }" />
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-user"></span>
@@ -26,13 +21,8 @@
               </div>
             </div>
             <div class="input-group mb-3">
-              <input
-                type="email"
-                v-model="user.email"
-                class="form-control"
-                placeholder="Email"
-                :class="{ 'is-invalid': !!userError.email }"
-              />
+              <input type="email" v-model="user.email" class="form-control" placeholder="Email"
+                :class="{ 'is-invalid': !!userError.email }" />
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-envelope"></span>
@@ -43,14 +33,8 @@
               </div>
             </div>
             <div class="input-group mb-3">
-              <input
-                type="password"
-                v-model="user.password"
-                class="form-control"
-                placeholder="Password"
-                autocomplete
-                :class="{ 'is-invalid': !!userError.password }"
-              />
+              <input type="password" v-model="user.password" class="form-control" placeholder="Password" autocomplete
+                :class="{ 'is-invalid': !!userError.password }" />
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-lock"></span>
@@ -61,13 +45,8 @@
               </div>
             </div>
             <div class="input-group mb-3">
-              <input
-                type="password"
-                v-model="user.password_confirmation"
-                class="form-control"
-                placeholder="Confirm Password"
-                autocomplete
-              />
+              <input type="password" v-model="user.password_confirmation" class="form-control"
+                placeholder="Confirm Password" autocomplete />
               <div class="input-group-append">
                 <div class="input-group-text">
                   <span class="fas fa-lock"></span>
@@ -77,29 +56,27 @@
             <div class="row">
               <div class="col-8"></div>
               <div class="col-4">
-                <button type="submit" class="btn btn-primary btn-block">
-                  Sign up
-                </button>
+                <button type="submit" class="btn btn-primary btn-block">Sign up</button>
               </div>
             </div>
           </form>
-          <p class="mb-1">
-            <router-link :to="{ name: 'auth.signin' }" class="text-center"
-              >I already have an account</router-link
-            >
-          </p>
-          <hr />
-          <div v-if="signedUpEmail" class="mt-3">
-            <p>
-              Signed up with <strong>{{ signedUpEmail }}</strong>
-            </p>
-            <p class="mb-3">Didn't receive the verification email?</p>
-            <button
-              @click="sendVerificationEmail"
-              class="btn btn-secondary btn-block"
-            >
-              Resend Verification Email
+          <div class="social-auth-links text-center mt-3 mb-3">
+            <p>- OR -</p>
+            <button @click="googleSignUp()" class="btn btn-block btn-danger">
+              <i class="fab fa-google mr-2"></i> Sign up with Google
             </button>
+          </div>
+          <p class="mb-1">
+            <router-link :to="{ name: 'auth.signin' }" class="text-center">I already have an account</router-link>
+          </p>
+          <hr>
+          <div v-if="signedUpEmail" class="mt-3">
+            <p>Signed up with <strong>{{ signedUpEmail }}</strong></p>
+            <p class="mb-3">
+              Didn't receive the verification email?
+            </p>
+            <button @click="sendVerificationEmail" class="btn btn-secondary btn-block">Resend Verification
+              Email</button>
           </div>
         </div>
       </div>
@@ -108,11 +85,10 @@
 </template>
 
 <script setup>
-import { useRouter } from "vue-router";
 import { reactive, ref } from "vue";
 import { apiSignUp, apiSendVerificationEmail } from "@/functions/api/auth";
 import { LoadingModal, MessageModal, CloseModal } from "@/functions/swal";
-const router = useRouter();
+import { apiGoogleOAuthRedirect } from "@/functions/api/google-oauth";
 
 const user = reactive({
   name: "",
@@ -138,28 +114,26 @@ function resetAllState() {
 async function signUp() {
   resetSignedUpEmail();
   try {
-    LoadingModal("Signing Up...");
+    LoadingModal('Signing Up...');
     await apiSignUp(user);
     signedUpEmail.value = user.email;
     resetAllState();
     return MessageModal({
       icon: "success",
       title: "Success",
-      text: "Your account has been created successfully.",
+      text: "Your account has been created successfully."
     });
   } catch (error) {
     const { response } = error;
     if (!response) {
-      return MessageModal({
-        icon: "error",
-        title: "Error",
-        text: error.message,
-      });
+      return MessageModal({ icon: "error", title: "Error", text: error.message });
     }
     const { status, data } = response;
     if (status === 422) {
       Object.keys(userError).forEach((key) => {
-        userError[key] = data.errors[key] ? data.errors[key][0] : "";
+        userError[key] = data.errors[key]
+          ? data.errors[key][0]
+          : "";
       });
       return CloseModal();
     }
@@ -170,22 +144,18 @@ async function signUp() {
 const signedUpEmail = ref("");
 async function sendVerificationEmail() {
   try {
-    LoadingModal("Requesting verification email...");
+    LoadingModal('Requesting verification email...');
     const response = await apiSendVerificationEmail(signedUpEmail.value);
     const { data } = response;
     return MessageModal({
       icon: "success",
       title: "Success",
-      text: data.message,
+      text: data.message
     });
   } catch (error) {
     const { response } = error;
     if (!response) {
-      return MessageModal({
-        icon: "error",
-        title: "Error",
-        text: error.message,
-      });
+      return MessageModal({ icon: "error", title: "Error", text: error.message });
     }
     const { data } = response;
     return MessageModal({ icon: "error", title: "Error", text: data.message });
@@ -194,4 +164,14 @@ async function sendVerificationEmail() {
 function resetSignedUpEmail() {
   signedUpEmail.value = "";
 }
+
+const googleSignUp = async () => {
+  try {
+    LoadingModal();
+    const response = await apiGoogleOAuthRedirect();
+    window.location.href = response.data.redirect_url;
+  } catch (error) {
+    return MessageModal({ icon: "error", title: "Error", text: error.response?.data?.message || error.message });
+  }
+};
 </script>
